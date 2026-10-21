@@ -1,7 +1,7 @@
-# ARTEX 本地运行调研报告
+# ARTEX 本地运行指南
 
-> 调研对象：artex-global（Windows 24H2 / PowerShell 环境）
-> 目标：理清工程结构、技术栈与本地运行条件，为后续搭建环境提供依据。
+> 对象：artex-global
+> 目标：理清工程结构、技术栈与本地运行条件，为搭建环境提供依据。
 
 ---
 
@@ -13,22 +13,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 2. 当前机器环境现状
-
-| 组件 | 状态 | 说明 |
-|---|---|---|
-| Node.js | ✅ v24.16.0 | Next.js 16 要求 ≥ 20.9，满足 |
-| npm | ✅ 11.13.0 | |
-| Go | ❌ 未安装 | `go.mod` 要求 1.26.3，CI 使用 1.26 |
-| Docker | ❌ 未安装 | Docker Compose 路径暂不可用 |
-| PostgreSQL | ❌ 未安装 | `psql` 不在 PATH |
-| winget | ✅ v1.29.380 | 可用于安装 Go 等组件 |
-
-仓库初始状态：不存在 `config.json`、`data/`、`web/node_modules`、`server/webui/dist`，属于全新未初始化状态。
-
----
-
-## 3. 工程结构
+## 2. 工程结构
 
 | 目录 | 职责 |
 |---|---|
@@ -48,7 +33,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 4. 技术栈
+## 3. 技术栈
 
 - **后端**：Go 1.26.3（纯 Go，`CGO_ENABLED=0`）
   - pgx v5（PostgreSQL 驱动）
@@ -66,7 +51,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 5. 后端启动链路（决定运行条件）
+## 4. 后端启动链路（决定运行条件）
 
 1. 定位配置文件：优先 CWD 下的 `config.json`（可用 `ARTEX_CONFIG` 覆盖）
 2. `NewManager`：
@@ -79,14 +64,14 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 6. 本地运行条件清单
+## 5. 本地运行条件清单
 
-### 6.1 硬性必需
+### 5.1 硬性必需
 
 | 条件 | 说明 |
 |---|---|
 | Go ≥ 1.26 | `go.mod` 为 1.26.3，CI 使用 1.26 |
-| Node.js ≥ 20 + npm | CI 使用 22，本机 24 可用 |
+| Node.js ≥ 20 + npm | CI 使用 22 |
 | PostgreSQL | 推荐 16，无扩展依赖；账号需能建库或预先建好 `artex` 库 |
 | Go module 网络 | `norma` 上游仓库已不可达，依赖 GOPROXY 缓存；`go.sum` 已有校验和，必要时用 `GOPROXY=https://goproxy.cn,direct` |
 | npm registry 网络 | `web/` 依赖安装 |
@@ -94,7 +79,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 | 端口 | 8787（前端+API）、8788（流量代理）；dev 模式前端 5173/3000 |
 | 目录 | `data/`（jwt.key、traffic 索引、CA）、`skills/`（已存在） |
 
-### 6.2 非必需（影响功能）
+### 5.2 非必需（影响功能）
 
 | 条件 | 说明 |
 |---|---|
@@ -103,7 +88,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 | 外部工具 | curl、nmap、ripgrep、python 等（Agent 执行真实命令时才需要） |
 | Playwright MCP | 默认禁用，本地不装也能跑 |
 
-### 6.3 主要环境变量速查
+### 5.3 主要环境变量速查
 
 | 变量 | 用途 |
 |---|---|
@@ -121,7 +106,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 7. Windows 上的 4 个坑
+## 6. Windows 上的 4 个坑
 
 1. **POSIX 脚本不可直接用**
    `start.sh` / `dev.sh` / `build.sh` 是 sh 脚本；Windows 用 `start.bat` 或直接运行 `artex.exe`。
@@ -148,7 +133,7 @@ ARTEX 是一个 **Go 单体后端（可内嵌 Next.js 前端）+ PostgreSQL** �
 
 ---
 
-## 8. 四条可选运行路径（成本从低到高）
+## 7. 四条可选运行路径（成本从低到高）
 
 ### 路径 A：纯前端 Mock（最快看 UI）
 
@@ -219,7 +204,7 @@ docker compose up -d
 
 ---
 
-## 9. 首次启动与验证
+## 8. 首次启动与验证
 
 1. 打开 `http://127.0.0.1:8787`
 2. 首次进入 `/setup`，输入启动日志中的 `[auth] ... Setup token`
@@ -235,7 +220,7 @@ docker compose up -d
 
 ---
 
-## 10. 建议
+## 9. 建议
 
 | 目标 | 建议路径 |
 |---|---|
